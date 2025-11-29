@@ -13,6 +13,7 @@ interface CheckoutPageProps {
 
 const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlaceOrder, onProceedToPayment }) => {
   const [showOnlineForm, setShowOnlineForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     mobile: '',
@@ -32,7 +33,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlac
 
   const handleOnlineSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onProceedToPayment();
+    setIsSubmitting(true);
+    
+    // Simulate a brief validation/processing delay for better UX
+    setTimeout(() => {
+      onProceedToPayment();
+      // We don't reset isSubmitting here because the component will unmount/view will change
+    }, 800);
   };
 
   const handleWhatsAppOrder = () => {
@@ -66,6 +73,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlac
           <button 
             onClick={onBack}
             className="flex items-center text-herbal-800 hover:text-herbal-600 transition-colors font-medium"
+            disabled={isSubmitting}
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Shop
@@ -95,6 +103,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlac
                 <button
                   onClick={handleWhatsAppOrder}
                   className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                  disabled={isSubmitting}
                 >
                   <MessageCircle className="h-5 w-5 mr-2" />
                   Place Order on WhatsApp
@@ -123,6 +132,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlac
                   <button
                     onClick={() => setShowOnlineForm(true)}
                     className="w-full bg-herbal-800 hover:bg-herbal-900 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                    disabled={isSubmitting}
                   >
                     <CreditCard className="h-5 w-5 mr-2" />
                     Enter Shipping Details
@@ -280,14 +290,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, total, onBack, onPlac
                         type="button"
                         onClick={() => setShowOnlineForm(false)}
                         className="flex-1 bg-white border border-gray-300 text-gray-700 font-bold py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors"
+                        disabled={isSubmitting}
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="flex-1 bg-herbal-600 hover:bg-herbal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center shadow-md"
+                        className="flex-1 bg-herbal-600 hover:bg-herbal-700 disabled:bg-herbal-400 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center shadow-md"
+                        disabled={isSubmitting}
                       >
-                        Proceed to Payment
+                         {isSubmitting ? (
+                            <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          ) : null}
+                          {isSubmitting ? 'Processing...' : 'Proceed to Payment'}
                       </button>
                     </div>
                   </form>

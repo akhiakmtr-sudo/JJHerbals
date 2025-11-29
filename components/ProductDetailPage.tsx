@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight, ShoppingBag, Clock, Droplet, List, Leaf } from './Icons';
 import { Product } from '../types';
 
@@ -11,6 +11,15 @@ interface ProductDetailPageProps {
 
 const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onBack, onAddToCart }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+
+  useEffect(() => {
+    setIsImageLoading(true);
+  }, [currentImageIndex]);
+
+  const handleImageLoad = () => {
+    setIsImageLoading(false);
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -42,10 +51,16 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ product, onBack, 
           <div className="mb-10 lg:mb-0">
             {/* Main Image Slider */}
             <div className="relative aspect-square bg-earth-50 rounded-2xl overflow-hidden shadow-sm border border-earth-100 mb-4 group">
+              {isImageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-herbal-50 z-10 animate-pulse">
+                   <Leaf className="h-16 w-16 text-herbal-200 opacity-50" />
+                </div>
+              )}
               <img
                 src={product.images[currentImageIndex]}
                 alt={`${product.name} view ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover object-center transition-transform duration-500"
+                className={`w-full h-full object-cover object-center transition-all duration-500 ${isImageLoading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+                onLoad={handleImageLoad}
               />
               
               {/* Slider Controls */}
